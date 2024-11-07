@@ -1,0 +1,7 @@
+bin/
+build/
+latex/
+html/
+.vscode/
+.*/
+.obj
