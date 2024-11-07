@@ -125,4 +125,4 @@ A series of demos to experiment with the Vulkan API.
 
 
 ## Licens
-[MIT license](./LICENSE).
+[MIT license](./LICENSE)
