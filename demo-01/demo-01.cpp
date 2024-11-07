@@ -15,7 +15,7 @@ int main() {
 
     // Window with the size of the screen
     tga::Window window = tgai.createWindow({screenResX, screenResY});
-    tgai.setWindowTitle(window, "TGA Vulkan Hello Triangle");
+    tgai.setWindowTitle(window, "demo-01");
 
     // Renderpass using the shaders and rendering to the window
     tga::RenderPass renderPass = tgai.createRenderPass(

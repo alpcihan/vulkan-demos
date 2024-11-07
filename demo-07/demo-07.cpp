@@ -274,7 +274,7 @@ int main() {
         resolution.first /= 4;
         resolution.second /= 4;
         window = tgai.createWindow({resolution.first, resolution.second});
-        tgai.setWindowTitle(window, "gpro");
+        tgai.setWindowTitle(window, "demo-07");
     }
 
     /* models */

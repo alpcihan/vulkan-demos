@@ -26,7 +26,7 @@ Application::Application() {
     m_width = screenX * SCREEN_SCALE;
     m_height = screenY * SCREEN_SCALE;
     m_window = tgai.createWindow({m_width, m_height});
-    tgai.setWindowTitle(m_window, "gpro");
+    tgai.setWindowTitle(m_window, "demo-05");
 
     // init time
     m_time = 0;

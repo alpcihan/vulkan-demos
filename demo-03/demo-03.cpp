@@ -30,7 +30,7 @@ int main()
     tga::Buffer resolutionBuffer = gpro::util::createBuffer(tga::BufferUsage::uniform, sizeof(Screen), toui8(ref(screen)), tgai);
 
     tga::Window window = tgai.createWindow({screen.w, screen.h});
-    tgai.setWindowTitle(window, "demo 3");
+    tgai.setWindowTitle(window, "demo-03");
 
     // Camera
     gpro::CameraController camera(tgai, window, 90, screen.w / float(screen.h), 0.1f, 30000.f, glm::vec3(0, 2.5, -3),glm::vec3{0, -0.5, 1}, glm::vec3{0, 1, 0});
