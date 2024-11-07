@@ -5,3 +5,5 @@ html/
 .vscode/
 .*/
 .obj
+
+.DS_Store
