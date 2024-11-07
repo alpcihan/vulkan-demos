@@ -1,0 +1,290 @@
+#version 450
+#extension GL_EXT_nonuniform_qualifier: enable
+
+layout(local_size_x = 32) in;
+layout(local_size_y = 32) in;
+
+struct Model{
+    // triangle data
+    uint offset;
+    uint stride;
+    // material
+    uint diffuseMapId;
+    vec3 diffuseColor;
+};
+
+struct Triangle {
+    vec3 vertices[3];
+    vec2 uvs[3];
+    vec3 normal;  
+};
+
+struct SphereLight {
+    vec3 position;
+    vec3 emissiveColor;
+    float radius;
+};
+
+struct Material {
+    vec3 diffuseColor;
+    vec3 emissiveColor;
+};
+
+layout(set = 0, binding = 0) uniform ModelCount {
+    uint u_modelCount;
+};
+
+layout(set = 0, binding = 1) readonly buffer Models {
+    Model r_models[];
+};
+
+layout(set = 0, binding = 2) uniform SphereLightCount {
+    uint u_sphereLightCount;
+};
+
+layout(set = 0, binding = 3) readonly buffer SphereLights {
+    SphereLight r_sphereLights[];
+};
+
+layout(set = 0, binding = 4) readonly buffer Triangles {
+    Triangle r_triangles[];
+};
+
+layout(set = 0, binding = 5) uniform sampler2D diffuseMaps[];
+
+layout(set = 0, binding = 6) uniform CameraData {
+    mat4 u_view;
+    mat4 u_projection;
+};
+
+layout(set = 0, binding = 7, rgba16f) uniform image2D traceState0;
+layout(set = 0, binding = 8, rgba16f) uniform image2D traceState1;
+layout(set = 0, binding = 9, rgba16f) uniform image2D traceState2;
+layout(set = 0, binding = 10, rgba16f) uniform image2D traceState3;
+
+layout(set = 0, binding = 11) uniform sampler2D s_randomNoise;
+layout(set = 0, binding = 12) uniform RandomOffset {
+    vec3 u_RANDOM3; // [0,1]
+};
+
+#define MAX_FLOAT 3.402823466e+38
+vec2 _RUV;
+
+float noise(vec2 uv) {
+    return(texture(s_randomNoise,uv)).x;
+}
+
+float rnd1() {
+    _RUV = fract(_RUV + (u_RANDOM3.xy + u_RANDOM3.yz)*u_RANDOM3.z);
+    return noise(_RUV);
+}
+
+vec3 rnd3() {
+    return vec3(rnd1(), rnd1(), rnd1());
+}
+
+/* utils */
+vec3 random_on_hemisphere(in vec3 normal) {
+    vec3 p = normalize(rnd3() * 2 - 1);
+
+    if (dot(p, normal) < 0.0) // if not in the same hemisphere as the normal
+        p = -p;
+    
+    return p;
+}
+
+/* ray helpers */
+struct Ray {
+    vec3 origin;
+    vec3 direction;
+};
+
+struct RayHit {
+    vec3 position;
+    float dist;
+    vec3 normal;
+    Material material;
+};
+
+Ray createRay(vec3 origin, vec3 direction) {
+    Ray ray;
+    ray.origin = origin;
+    ray.direction = direction;
+
+    return ray;
+}
+
+Ray createCameraRay(vec2 uv) {
+    const mat4 camToWorld = inverse(u_view);
+
+    // camera origin
+    vec3 origin = (camToWorld*vec4(0,0,0,1)).xyz;
+    
+    // invert the perspective projection of the view-space position
+    vec3 direction = (inverse(u_projection) * vec4(uv, 0.0f, 1.0f)).xyz;
+
+    // direction from camera to world space and normalize
+    direction = (camToWorld * vec4(direction, 0.0f)).xyz;
+    direction = normalize(direction);
+
+    return createRay(origin, direction);
+}
+
+RayHit createRayHit() {
+    RayHit hit;
+    hit.position = vec3(0.0f, 0.0f, 0.0f);
+    hit.dist = MAX_FLOAT;
+    hit.normal = vec3(0.0f, 0.0f, 0.0f);
+    return hit;
+}
+
+/* intersection functions */
+void intersectRayTriangle(in Ray ray, in Model model, in Triangle triangle, inout RayHit bestHit) {
+    const float EPSILON = 0.0000001;
+    
+    vec3 vertex0 = triangle.vertices[0];
+    vec3 vertex1 = triangle.vertices[1];
+    vec3 vertex2 = triangle.vertices[2];
+
+    vec3 edge1 = vertex1 - vertex0;
+    vec3 edge2 = vertex2 - vertex0;
+    vec3 rayVecXe2 = cross(ray.direction, edge2);
+
+    float det = dot(edge1, rayVecXe2);
+
+    if (det > -EPSILON && det < EPSILON) return; // This ray is parallel to this triangle.
+
+    float invDet = 1.0 / det;
+    vec3 s = ray.origin - vertex0;
+    float u = invDet * dot(s, rayVecXe2);
+
+    if (u < 0.0 || u > 1.0) return;
+
+    vec3 sXe1 = cross(s, edge1);
+    float v = invDet * dot(ray.direction, sXe1);
+
+    if (v < 0.0 || u + v > 1.0) return;
+
+    // At this stage, we can compute t to find out where the intersection point is on the line.
+    float t = invDet * dot(edge2, sXe1);
+
+    if (t < bestHit.dist && t > EPSILON) { // ray intersection
+        bestHit.position = ray.origin + ray.direction * t;
+        bestHit.dist = t;
+        bestHit.normal = triangle.normal;
+        
+        bestHit.material.emissiveColor = vec3(0);
+
+        // Calculate barycentric coordinates
+        float w = 1.0 - u - v;
+        float sU = u * triangle.uvs[1].x + v * triangle.uvs[2].x + w * triangle.uvs[0].x;
+        float sV = u * triangle.uvs[1].y + v * triangle.uvs[2].y + w * triangle.uvs[0].y;
+
+        bestHit.material.diffuseColor = texture(diffuseMaps[model.diffuseMapId], vec2(sU, sV)).xyz *
+                                        model.diffuseColor;
+    }
+}
+
+void intersectSphereLight(in Ray ray, in SphereLight sphereLight, inout RayHit bestHit) {
+    // Calculate distance along the ray where the sphere is intersected
+    vec3 d = ray.origin - sphereLight.position;
+    float p1 = -dot(ray.direction, d);
+    float p2sqr = p1 * p1 - dot(d, d) + sphereLight.radius * sphereLight.radius;
+    if (p2sqr < 0)
+        return;
+    float p2 = sqrt(p2sqr);
+    float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
+    if (t > 0 && t < bestHit.dist) {
+        bestHit.dist = t;
+        bestHit.position = ray.origin + t * ray.direction;
+        bestHit.normal = normalize(bestHit.position - sphereLight.position);
+        bestHit.material.diffuseColor = sphereLight.emissiveColor;
+        bestHit.material.emissiveColor = sphereLight.emissiveColor;
+    }
+}
+
+/* trace */
+RayHit checkHit(Ray ray) {
+    RayHit bestHit = createRayHit();
+
+    // spherical light sources
+    for(int i = 0; i < u_sphereLightCount; i++) {
+        intersectSphereLight(ray, r_sphereLights[i], bestHit);
+    }
+    
+    // models
+    for(int m = 0; m < u_modelCount; m++) {
+        uint offset = r_models[m].offset;
+        uint stride = r_models[m].stride;
+
+        uint end = offset + stride;
+        for(int t = 0; t < end; t++) {
+            intersectRayTriangle(ray, r_models[m], r_triangles[t], bestHit);
+        }
+    }
+
+    return bestHit;
+}
+
+vec3 trace(Ray ray) {   
+    vec3 incomingLight = vec3(0);
+    vec3 rayColor = vec3(1);
+
+    // TODO: can also iterate this over frames
+    for(int i = 0; i < 4; i++)
+    {
+        // check hit
+        RayHit hit = checkHit(ray);
+        
+        // info update
+        if (hit.dist < MAX_FLOAT) {  
+            ray.origin = hit.position + hit.normal * 0.001f;
+            ray.direction = random_on_hemisphere(hit.normal);
+
+            Material material = hit.material;
+
+            float lightStrength = dot(hit.normal, ray.direction);
+            incomingLight += material.emissiveColor * rayColor;
+
+            rayColor *= material.diffuseColor * lightStrength;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return incomingLight;
+}
+
+void main() {  
+    ivec2 screenSize = imageSize(traceState0);
+    ivec2 id = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    
+    vec2 uv = vec2((vec2(id)) / screenSize * 2.0f - 1.0f);
+    _RUV = uv;
+    
+    // read the trace states
+    const vec4 state0 = imageLoad(traceState0, id);
+    const vec4 state2 = imageLoad(traceState2, id);
+
+    Ray ray = createCameraRay(uv);
+    
+    // TODO: first trace already gets calculated in camera-update.comp for depth calculation. Use it.
+    vec3 color = trace(ray); 
+
+    // accumulate
+    vec3 oldColor = state0.xyz;
+    float iterationCount = state2.r;
+    float weight = 1.0 / (iterationCount + 1);
+    vec3 finalColor = oldColor * (1-weight) + color * weight;
+
+    // update the trace states
+    vec4 rgbd = vec4(finalColor, state0.w);
+    vec4 info = vec4(iterationCount+1,0,0,0);
+
+    imageStore(traceState0, id, rgbd); // update current frame
+    imageStore(traceState1, id, rgbd); // update prev frame
+    imageStore(traceState2, id, info); // update current frame
+    imageStore(traceState3, id, info); // update prev frame
+}

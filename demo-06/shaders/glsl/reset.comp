@@ -1,0 +1,63 @@
+#version 450
+
+layout(local_size_x = 32) in;
+layout(local_size_y = 32) in;
+
+/* trace state 0 (to write) */ 
+// r: diffuse.r
+// g: diffuse.g
+// b: diffuse.b
+// a: depth
+layout(set = 0, binding = 0, rgba16f) uniform image2D traceState0; 
+/* trace state 1 (to read) */
+// r: diffuse.r
+// g: diffuse.g
+// b: diffuse.b
+// a: depth
+layout(set = 0, binding = 1, rgba16f) uniform image2D traceState1; 
+/* trace state 2 (to write) */
+// r: sample count 
+// g: is from previous frame 
+// b: -
+// a: -                                                         
+layout(set = 0, binding = 2, rgba16f) uniform image2D traceState2;
+/* trace state 3 (to read) */
+// r: sample count 
+// g: -
+// b: -
+// a: -                                                           
+layout(set = 0, binding = 3, rgba16f) uniform image2D traceState3; 
+
+#define MAX_FLOAT 3.402823466e+38
+
+void main() {
+    ivec2 id = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+
+    imageStore(traceState0, id,
+        vec4(1,
+             1,
+             1,
+             MAX_FLOAT
+        ));
+    
+    imageStore(traceState1, id,
+        vec4(1,
+             1,
+             1,
+             MAX_FLOAT
+        ));
+
+    imageStore(traceState2, id,
+        vec4(0,
+             0,
+             0,
+             0
+        ));
+    
+    imageStore(traceState3, id,
+        vec4(0,
+             0,
+             0,
+             0
+        ));
+}
