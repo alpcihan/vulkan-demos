@@ -33,7 +33,7 @@ A series of demos to experiment with the Vulkan API.
 1) A true work of art
 
 #### Screenshot
-<img width="360" alt="" src="./resources/screenshots/demo-01.jpg">
+<img width="520" alt="" src="./resources/screenshots/demo-01.jpg">
 
 
 ### Demo-02 (Forward Rendering)
@@ -43,7 +43,7 @@ A series of demos to experiment with the Vulkan API.
 2) Blinn-Phong shading
 
 #### Screenshot
-<img width="360" alt="" src="./resources/screenshots/demo-02.jpg">
+<img width="520" alt="" src="./resources/screenshots/demo-02.jpg">
 
 
 ### Demo-03 (Deferred Rendering + Post Processing)
@@ -54,9 +54,9 @@ A series of demos to experiment with the Vulkan API.
 3) Post processing pass with dithering effect
 
 #### Screenshots:
-<img width="360" alt="" src="./resources/screenshots/demo-03_without-post-processing.jpg">
+<img width="520" alt="" src="./resources/screenshots/demo-03_without-post-processing.jpg">
 <br>
-<img width="360" alt="" src="./resources/screenshots/demo-03_post-processing.JPG">
+<img width="520" alt="" src="./resources/screenshots/demo-03_post-processing.JPG">
 
 
 ### Demo-04 (Instanced Rendering + Dynamic Batching)
@@ -64,7 +64,7 @@ A series of demos to experiment with the Vulkan API.
 #### Features:
 1) Instanced Rendering
 2) Dynamic Batching
-3) Runtime mesh loading
+3) Scene loading and updating on runtime
 
 #### How to use
 ##### Runtime obj loading
@@ -76,7 +76,7 @@ A series of demos to experiment with the Vulkan API.
 - Use WASD, Shift Space and arrows to move the scene camera.
 
 #### Video
-<img width="360" alt="" src="resources/screenshots/demo-04.gif">
+<img width="520" alt="" src="resources/screenshots/demo-04.gif">
 
 
 ### Demo-05 (GPU Driven Rendering)
@@ -91,7 +91,7 @@ A series of demos to experiment with the Vulkan API.
 - Use WASD, Shift Space and arrows to move the scene camera.
 
 #### Video
-<img width="360" alt="" src="resources/screenshots/demo-05.gif">
+<img width="520" alt="" src="resources/screenshots/demo-05.gif">
 
 
 ### Demo-06 (Path Tracing + Motion Vectors)
@@ -103,7 +103,7 @@ A series of demos to experiment with the Vulkan API.
 4) Recovering diffuse light info with depth + motion vector thresholds
 
 #### Video
-<img width="360" alt="" src="resources/screenshots/demo-06_motion-vectors.gif">
+<img width="520" alt="" src="resources/screenshots/demo-06_motion-vectors.gif">
 
 
 ### Demo-07 (Path Tracing with BVH)
@@ -112,7 +112,7 @@ A series of demos to experiment with the Vulkan API.
 1) Path tracing using BVH
 
 #### Screenshot
-<img width="360" alt="" src="resources/screenshots/demo-07.jpg">
+<img width="520" alt="" src="resources/screenshots/demo-07.jpg">
 
 
 ### Demo-08 (Path Tracing with RTX)
@@ -121,7 +121,7 @@ A series of demos to experiment with the Vulkan API.
 1) Path tracing using RTX
 
 #### Screenshot
-<img width="360" alt="" src="resources/screenshots/demo-08.jpg">
+<img width="520" alt="" src="resources/screenshots/demo-08.jpg">
 
 
 ## Licens
