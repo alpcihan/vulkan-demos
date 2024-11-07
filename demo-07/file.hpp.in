@@ -1,0 +1,18 @@
+#pragma once
+
+#include <string>
+
+#define GPRO_SHADER_DIR "${SHADER_DIR}/"
+#define GPRO_RESOURCE_DIR "${RESOURCE_DIR}/"
+
+inline std::string shaderPath(const std::string& relative) {
+    constexpr const char *shaderDir = GPRO_SHADER_DIR;
+    std::string absolutePath = shaderDir + relative;
+    return absolutePath;
+}
+
+inline std::string resourcePath(const std::string& relative) {
+    constexpr const char *resourceDir = GPRO_RESOURCE_DIR;
+    std::string absolutePath = resourceDir + relative;
+    return absolutePath;
+}
