@@ -1,0 +1,7 @@
+[submodule "external/TGA"]
+    path = external/TGA
+    url = https://github.com/Estard/TGA.git
+
+[submodule "external/yaml-cpp"]
+    path = external/yaml-cpp
+    url = https://github.com/jbeder/yaml-cpp.git
