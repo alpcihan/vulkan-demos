@@ -1,0 +1,29 @@
+#pragma once
+
+#include "gpro/shared.hpp"
+
+#define GPRO_CONFIG_DIR "${CONFIG_DIR}/"
+#define GPRO_SHADER_DIR "${SHADER_DIR}/"
+#define GPRO_RESOURCE_DIR "${RESOURCE_DIR}/"
+
+namespace gpro {
+
+inline std::string configPath(const std::string& relative) {
+    constexpr const char *shaderDir = GPRO_CONFIG_DIR;
+    std::string absolutePath = shaderDir + relative;
+    return absolutePath;
+}
+
+inline std::string shaderPath(const std::string& relative) {
+    constexpr const char *shaderDir = GPRO_SHADER_DIR;
+    std::string absolutePath = shaderDir + relative;
+    return absolutePath;
+}
+
+inline std::string resourcePath(const std::string& relative) {
+    constexpr const char *resourceDir = GPRO_RESOURCE_DIR;
+    std::string absolutePath = resourceDir + relative;
+    return absolutePath;
+}
+
+}  // namespace gpro

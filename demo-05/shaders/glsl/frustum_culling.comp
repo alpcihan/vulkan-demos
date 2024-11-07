@@ -1,0 +1,80 @@
+#version 450
+
+struct AABB {
+    vec3 mn;
+    vec3 mx;
+};
+
+struct DrawIndexedIndirectCommand {
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int vertexOffset;
+    uint firstInstance;
+};
+
+layout(set = 0, binding = 0) readonly buffer Models{
+    mat4 models[];
+};
+
+layout(set = 0, binding = 1) readonly buffer AABBs{
+    AABB aabbs[];
+};
+
+layout(set = 0, binding = 2) uniform Camera {
+    mat4 view;
+    mat4 projection;
+};
+
+layout(set = 0, binding = 3) readonly buffer InstanceIdToMeshIDMap{
+    uint instanceIdToMeshIDMap[];
+};
+
+layout(set = 0, binding = 4) writeonly buffer VisibleObjectCount{
+    uint visibleObjectCount;
+}; 
+
+layout(set = 0, binding = 5) writeonly buffer DIICMDs{
+    DrawIndexedIndirectCommand diicmds[];
+};
+
+layout(local_size_x = 64) in;
+
+vec3 screenSpace(vec3 position, in mat4 model)
+{
+    vec4 ss = projection * view * model * vec4(position, 1);
+    return (ss / ss.w).xyz;
+}
+
+void main(){
+    uint id = gl_GlobalInvocationID.x; // matched with instance id
+    uint meshID = instanceIdToMeshIDMap[id];
+    mat4 model = models[id];
+    AABB aabb = aabbs[meshID];
+    
+    // cursed screen space culling
+    vec3 mx = aabb.mx;
+    vec3 mn = aabb.mn;
+    vec3 p1 = screenSpace(vec3(mx.x, mx.y, mx.z), model);
+    vec3 p2 = screenSpace(vec3(mn.x, mx.y, mx.z), model);
+    vec3 p3 = screenSpace(vec3(mx.x, mn.y, mx.z), model);
+    vec3 p4 = screenSpace(vec3(mx.x, mx.y, mn.z), model);
+    vec3 p5 = screenSpace(vec3(mn.x, mn.y, mx.z), model);
+    vec3 p6 = screenSpace(vec3(mx.x, mn.y, mn.z), model);
+    vec3 p7 = screenSpace(vec3(mn.x, mn.y, mn.z), model);
+    vec3 p8 = screenSpace(vec3(mn.x, mn.y, mn.z), model);
+    
+    bool isVisible = abs(p1.x) < 1 && abs(p1.y) < 1 && (p1.z < 1 && p1.z > 0) || 
+                     abs(p2.x) < 1 && abs(p2.y) < 1 && (p2.z < 1 && p2.z > 0) || 
+                     abs(p3.x) < 1 && abs(p3.y) < 1 && (p3.z < 1 && p3.z > 0) || 
+                     abs(p4.x) < 1 && abs(p4.y) < 1 && (p4.z < 1 && p4.z > 0) || 
+                     abs(p5.x) < 1 && abs(p5.y) < 1 && (p5.z < 1 && p5.z > 0) || 
+                     abs(p6.x) < 1 && abs(p6.y) < 1 && (p6.z < 1 && p6.z > 0) || 
+                     abs(p7.x) < 1 && abs(p7.y) < 1 && (p7.z < 1 && p7.z > 0) || 
+                     abs(p8.x) < 1 && abs(p8.y) < 1 && (p8.z < 1 && p8.z > 0);
+                     
+    uint instanceCount = isVisible ? 1 : 0;
+
+    diicmds[id].instanceCount = instanceCount;
+    atomicAdd(visibleObjectCount, instanceCount);
+}
