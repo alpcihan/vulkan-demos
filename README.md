@@ -124,5 +124,5 @@ A series of demos to experiment with the Vulkan API.
 <img width="520" alt="" src="resources/screenshots/demo-08.jpg">
 
 
-## Licens
+## License
 [MIT license](./LICENSE)
