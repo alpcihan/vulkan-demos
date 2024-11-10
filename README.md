@@ -19,7 +19,7 @@ A series of demos to experiment with the Vulkan API.
 
 ## Getting started
 
-- Download the repository with it's dependencies with: 
+- Download the repository with its dependencies with: 
     ```
     git clone --recursive https://github.com/alpcihan/vulkan-demos
     ```
@@ -50,8 +50,8 @@ A series of demos to experiment with the Vulkan API.
 
 #### Features:
 1) Deferred rendering
-2) Blinn-Phong shading with dozens of ligts
-3) Post processing pass with dithering effect
+2) Blinn-Phong shading with dozens of lights
+3) Post-processing pass with dithering effect
 
 #### Screenshots:
 <img width="520" alt="" src="./resources/screenshots/demo-03_without-post-processing.jpg">
@@ -82,13 +82,13 @@ A series of demos to experiment with the Vulkan API.
 ### Demo-05 (GPU Driven Rendering)
 
 #### Features
-1) GPU driven rendering pipeline
+1) GPU-driven rendering pipeline
 2) Instanced indirect rendering
 3) Frustum culling with compute shader
 
 #### How to use
 ##### Camera controller
-- Use WASD, Shift Space and arrows to move the scene camera.
+- Move the scene camera by using WASD, Shift Space, and arrows.
 
 #### Video
 <img width="520" alt="" src="resources/screenshots/demo-05.gif">
