@@ -3,9 +3,9 @@
 A series of demos to experiment with the Vulkan API.
 
 ## Table of Contents
-
-1. [Getting Started](#getting-started)
-2. [Demos](#demos)
+1. [Platform](#platform)
+2. [Getting Started](#getting-started)
+3. [Demos](#demos)
    - [Demo-01: Triangle](#demo-01-triangle)
    - [Demo-02: Forward Rendering](#demo-02-forward-rendering)
    - [Demo-03: Deferred Rendering + Post Processing](#demo-03-deferred-rendering--post-processing)
@@ -14,16 +14,22 @@ A series of demos to experiment with the Vulkan API.
    - [Demo-06: Path Tracing + Motion Vectors](#demo-06-path-tracing--motion-vectors)
    - [Demo-07: Path Tracing with BVH](#demo-07-path-tracing-with-bvh)
    - [Demo-08: Path Tracing with RTX](#demo-08-path-tracing-with-rtx)
-3. [License](#license)
+4. [License](#license)
 
+## Platform
+**Operating system:** Tested only on Windows.
+
+**Hardware:** Only to run the [demo-08](./demo-08), a GPU with RTX support is required.
 
 ## Getting started
 
-- Download the repository with its dependencies with: 
+1) Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) if it is not already installed.
+
+2) Download the repository with its dependencies using: 
     ```
     git clone --recursive https://github.com/alpcihan/vulkan-demos
     ```
-- Use `CMakeLists.txt` at the root to build the project with CMake. It will create corresponding demo executables with `demo-<id>` naming format (e.g., `demo-01.exe`).
+3) Use `CMakeLists.txt` at the root to build the project with CMake. It will create corresponding demo executables with `demo-<id>` naming format (e.g., `demo-01.exe`).
 
 ## Demos
 
