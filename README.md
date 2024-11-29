@@ -106,7 +106,7 @@ A series of demos to experiment with the Vulkan API.
 1) Path tracing with Monte Carlo method
 2) Motion vector texture generation
 3) Depth texture generation
-4) Recovering diffuse light data with depth + motion vector
+4) Recovering diffuse reflection data with depth + motion vector
 
 #### Video
 <img width="520" alt="" src="resources/screenshots/demo-06_motion-vectors.gif">
