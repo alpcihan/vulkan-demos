@@ -61,8 +61,7 @@ A series of demos to experiment with the Vulkan API.
 
 #### Screenshots:
 <img width="520" alt="" src="./resources/screenshots/demo-03_without-post-processing.jpg">
-<br>
-<img width="520" alt="" src="./resources/screenshots/demo-03_post-processing.JPG">
+<img width="520" alt="" src="./resources/screenshots/demo-03_post-processing.jpg">
 
 
 ### Demo-04 (Instanced Rendering + Dynamic Batching)
